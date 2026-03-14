@@ -1,0 +1,13 @@
+{
+  "name": "ecommerce-monorepo",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*", "scripts"],
+  "scripts": {
+    "dev:storefront": "npm run dev --workspace=apps/storefront",
+    "dev:admin": "npm run dev --workspace=apps/admin",
+    "build:storefront": "npm run build --workspace=apps/storefront",
+    "build:admin": "npm run build --workspace=apps/admin",
+    "build": "npm run build --workspaces",
+    "seed": "npm run seed-admin --workspace=scripts"
+  }
+}
