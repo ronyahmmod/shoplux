@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
@@ -14,12 +14,13 @@ const userSchema = new mongoose.Schema(
     password: { type: String, select: false }, // hidden by default
     role: {
       type: String,
-      enum: ['customer', 'admin'],
-      default: 'customer',
+      enum: ["customer", "admin"],
+      default: "customer",
     },
     image: { type: String },
-    provider: { type: String, default: 'credentials' }, // 'google' | 'facebook'
+    provider: { type: String, default: "credentials" }, // 'google' | 'facebook'
     isActive: { type: Boolean, default: true },
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     address: {
       street: String,
       city: String,
@@ -28,12 +29,12 @@ const userSchema = new mongoose.Schema(
       country: String,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Hash password before save
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password') || !this.password) return next();
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password") || !this.password) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
@@ -49,4 +50,4 @@ userSchema.methods.toJSON = function () {
   return obj;
 };
 
-export const User = mongoose.models.User || mongoose.model('User', userSchema);
+export const User = mongoose.models.User || mongoose.model("User", userSchema);

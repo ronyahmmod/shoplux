@@ -10,7 +10,6 @@ export async function POST(request) {
     const tran_id = body.get("tran_id");
     const val_id = body.get("val_id");
     const status = body.get("status");
-    const store_amount = body.get("store_amount");
 
     await connectDB();
 
@@ -19,26 +18,18 @@ export async function POST(request) {
         paymentStatus: "paid",
         status: "confirmed",
         sslcommerzValId: val_id,
-        paidAmount: parseFloat(store_amount) || 0,
-        paidAt: new Date(),
         $push: {
           statusHistory: {
             status: "confirmed",
-            note: `Payment verified via SSLCommerz. Validation ID: ${val_id}`,
+            note: `IPN: Payment confirmed. Val ID: ${val_id}`,
           },
         },
       });
     }
 
-    return NextResponse.redirect(
-      new URL("/orders?payment=success", request.url),
-      { status: 303 },
-    );
+    return NextResponse.json({ received: true });
   } catch (err) {
-    console.error("Payment success error:", err);
-    return NextResponse.redirect(
-      new URL("/orders?payment=error", request.url),
-      { status: 303 },
-    );
+    console.error("IPN error:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

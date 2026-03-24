@@ -48,6 +48,14 @@ export default function CheckoutPage() {
       router.push("/auth/login?callbackUrl=/checkout");
       return;
     }
+
+    const required = ["name", "phone", "street", "city", "country"];
+    const missing = required.filter((k) => !address[k]?.trim());
+    if (missing.length) {
+      setError(`Please fill in: ${missing.join(", ")}`);
+      return;
+    }
+
     setPlacing(true);
     setError("");
     try {
@@ -67,12 +75,15 @@ export default function CheckoutPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to place order");
+
       clearCart();
+
       if (data.gatewayUrl) {
         window.location.href = data.gatewayUrl;
-      } else {
-        router.push(`/orders?success=1`);
+        return;
       }
+
+      router.push(data.redirect || "/orders?success=1");
     } catch (err) {
       setError(err.message);
     } finally {
